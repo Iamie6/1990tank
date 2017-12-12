@@ -43,7 +43,7 @@ export class Tank {
 	//
 	//H W tank 检测碰撞时 用的 宽高
 	//X Y tank 检测碰撞时 用的 位置
-	constructor(x, y, type){
+	constructor(x, y, type, root){
 		this.x = x
 		this.y = y
 
@@ -59,15 +59,74 @@ export class Tank {
 		this.preY = this.type * 128
 
 		if(type > 1){
-			this.move()
+			this.move(root)
 		}
 	}
 
-	move(){
+	move(root){
 		setInterval(()=>{
-			
-		}, 20);
+			let a = this.gogogo(root)
+			switch(this.dir){
+				case 0:
+					if(this.y <=0){
+						this.y = 0
+						a = 0
+					}else{
+						this.y -= a
+					}
+					break;
+				case 1:
+					if(this.x >=384){
+						this.x = 384
+						a = 0
+					}else{
+						this.x += a
+					}
+					break;
+				case 2:
+					if(this.y >= 384){
+						this.y = 384
+						a = 0
+					}else{
+						this.y += a
+					}
+					break;
+				case 3:
+					if(this.x <= 0){
+						this.x = 0
+						a = 0
+					}else{
+						this.x -= a
+					}
+					break;
+			}
+			if(a == 0 || Math.random() < 0.01){
+				this.dir = this.random()
+			}
+		}, 24)
 	}
+
+	gogogo(root){
+        const res = []
+        root.getArea(this.rect, res)
+
+        if(res.length === 0)return 1;
+
+        if(res.length > 1 && res[0].type > res[1].type){
+            const tmp = res[0]
+            res[0] = res[1]
+            res[1] = tmp
+        }
+
+        for(let i =0; i < res.length; i++){
+            if(res[i].type < 20){
+                return 0
+            } else if(res[i].type == 20){
+                return 2
+            }
+        }
+        return 1
+    }
 
 	draw(ct, tank){
 		ct.drawImage(
@@ -79,6 +138,10 @@ export class Tank {
 			this.y,
 			32,32
 		)
+	}
+
+	random(){
+		return Math.floor(Math.random()*4)
 	}
 
 	get rect(){

@@ -34,14 +34,14 @@ export default {
             const wall = await loadImg(wallPath)
             const tank = await loadImg(tankPath)
 
-            const player1 = new Tank(32*4+16,32*12,0)
+            const player1 = new Tank(32*4+16,32*12,0,root)
             const tank_bullet = [player1]
 
-            tank_bullet.push(new Tank(0,0,2))
+            tank_bullet.push(new Tank(0,0,2,root))
             
             let stop = false
             document.addEventListener('click',function(){
-                stop = true
+                //stop = true
                 //_map[322].map = [0,0,0,1]
                 //_map[322].isChange = 1
             },false)
@@ -107,7 +107,9 @@ export default {
                                 tank.y = 0
                                 return;
                             }
+                            console.time('go')
                             tank.y -= gogogo()
+                            console.timeEnd('go')
                             /*if(go == 1){
                                 tank.y --
                             }else if(go == 2){
@@ -139,7 +141,6 @@ export default {
                         dir = 83
                         tank.dir = 2
                         timer = setInterval(()=>{
-                            console.log(tank.y)
                             if(tank.y >= 384){
                                 tank.y = 384
                                 return;
@@ -183,27 +184,24 @@ export default {
             function gogogo(){
                 const res = []
                 root.getArea(tank.rect, res)
+
+                if(res.length === 0)return 1;
+
+                if(res.length > 1 && res[0].type > res[1].type){
+                    const tmp = res[0]
+                    res[0] = res[1]
+                    res[1] = tmp
+                }
+
                 for(let i =0; i < res.length; i++){
-                    if(res[i].type > 0 && res[i].type <= 19){
+                    if(res[i].type < 20){
                         return 0
-                    }else if(res[i].type == 20){
+                    } else if(res[i].type == 20){
                         return 2
                     }
                 }
                 return 1
             }
-        },
-        collided(root,obj){
-            const res = []
-            root.getArea(obj.rect(), res)
-            if(res.length){
-                for(let i = 0; i < res.length; i++){
-                    if(!this.isCollided(res[i], obj.rect())){
-                        res.splice(i--,1)
-                    }
-                }
-            }
-            return res
         },
         isCollided (rect,block){
             if(rect.x > block.x + block.w){

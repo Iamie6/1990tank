@@ -66,7 +66,9 @@ export function mapDraw(map, ct, oImg, width = 416, height = 416){
 		const drawRect = map[i].draw
 		ct.clearRect(drawRect.x, drawRect.y, 16, 16)
 		draw(map[i].map, map[i].type, ct, oImg, drawRect.x, drawRect.y)
-		map[i].isChange = 0
+		if(map[i].type < 18){
+			map[i].isChange = 0
+		}
 	}
 	
 }

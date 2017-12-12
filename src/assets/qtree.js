@@ -74,11 +74,11 @@ class Qtree{
 	// 获取 rect 可能 碰撞物体的 集合
 	getArea(rect,res){
 		if(this.level === 4){
-			this.item.forEach((item)=>{
-				if(!this.isContain(res, item) &&  this.isCollided(rect,item.rect)){
-					res.push(item)
+			for (let i = 0; i < this.item.length; i++) {
+				if(!this.isContain(res, this.item[i]) &&  this.isCollided(rect,this.item[i].rect)){
+					res.push(this.item[i])
 				}
-			})
+			}
 		}else{
 			for(let i = 0; i < this.children.length; i++){
 				if(this.children[i].isCollided(rect)){

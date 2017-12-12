@@ -26,52 +26,49 @@ export default {
         async start(level,ct){
             const _this = this
             const root = new Qtree()
-            const _map = map(level)
-
-            //root.formatMap(_map)
-            
-
+            let _map = map(level)
+            root.formatMap(_map)
             const wallCanvas = this.createC()
             const tankPath = '/static/t.jpg'
             const wallPath = '/static/wall.png'
             const wall = await loadImg(wallPath)
             const tank = await loadImg(tankPath)
 
-            const player1 = new Tank(32*6,32*12,0)
+            const player1 = new Tank(32*4+16,32*12,0)
+            const tank_bullet = [player1]
+
+            tank_bullet.push(new Tank(0,0,2))
+            
             let stop = false
             document.addEventListener('click',function(){
                 stop = true
+                //_map[322].map = [0,0,0,1]
+                //_map[322].isChange = 1
             },false)
 
             function draw(){
                 if(stop)return
                 //stop = true
-
-                console.time('a')
-                
-                root.formatMap(_map)
-                
-                console.timeEnd('a')
-
-
                 //
                 //console.time('b')
 
-                    /*const res = []
-                    root.getArea(player1.rect, res)
-                    console.log(res)*/
-                    //console.time('draw')
-                        //mapDraw(_map, wallCanvas.getContext('2d'), wall)
-                    //console.timeEnd('draw')
+                //     /*const res = []
+                //     root.getArea(player1.rect, res)
+                //     console.log(res)*/
+                //     console.time('draw')
+                        mapDraw(_map, wallCanvas.getContext('2d'), wall)
+                //     console.timeEnd('draw')
 
-                    //console.time('tank')
-                        player1.draw(wallCanvas.getContext('2d'),tank)
-                    //console.timeEnd('tank')
+                //     console.time('tank')
+                        for (let i = 0; i < tank_bullet.length; i++) {
+                            tank_bullet[i].draw(wallCanvas.getContext('2d'),tank)
+                        }
+                //     console.timeEnd('tank')
                     
-                    //console.time('clear')
+                //     console.time('clear')
                         ct.clearRect(0,0,416,416)
                         ct.drawImage(wallCanvas,0,0)
-                    //console.timeEnd('clear')
+                //     console.timeEnd('clear')
                     
                 //console.timeEnd('b') 
 
@@ -81,7 +78,7 @@ export default {
             
             draw()
            
-            this.addKeyboardHandle(player1,root)
+            this.addKeyboardHandle(tank_bullet[0], root)
         },
         createC(){
             const c = document.createElement('canvas')
@@ -90,68 +87,87 @@ export default {
             return c
         },
         addKeyboardHandle(tank,root){
-            let timer = null //player1 方向定时器
+            const _this = this
+            let timer = null //player1 定时器
             let dir = 0
             //w:87 上
             //a:65 左
             //s:83 下
             //d:68 右
+            //tank.dir: 0上  1右  2下  3左
             document.addEventListener('keydown',function(ev){
                 switch(ev.keyCode){
                     case 87:
-                        if(dir == 87)return;
-                        dir = 87;
+                        if(dir == 87)return
                         clearInterval(timer)
+                        dir = 87
+                        tank.dir = 0
                         timer = setInterval(()=>{
-                            const res = []
                             if(tank.y <= 0 ){
                                 tank.y = 0
                                 return;
                             }
-                            root.getArea(tank.rect, res)
-                            console.log(res)
-                            for(let i =0; i < res.length; i++){
-                                if(res.type){
-
-                                }
-                            }
-                            tank.y--;
+                            tank.y -= gogogo()
+                            /*if(go == 1){
+                                tank.y --
+                            }else if(go == 2){
+                                tank.y -= 2
+                            }*/
                         },20);
                         break;
                     case 65:
                         if(dir == 65)return;
                         clearInterval(timer)
-                        dir = 65;
+                        dir = 65
+                        tank.dir = 3
                         timer = setInterval(()=>{
                             if(tank.x<=0){
                                 tank.x = 0
                                 return;
                             }
-                            tank.x--;
+                            tank.x -= gogogo()
+                            /*if(go == 1){
+                                tank.x --
+                            }else if(go == 2){
+                                tank.x -= 2
+                            }*/
                         },20);
                         break;
                     case 83:
                         if(dir == 83)return;
                         clearInterval(timer)
-                        dir = 83;
+                        dir = 83
+                        tank.dir = 2
                         timer = setInterval(()=>{
-                            if(tank.y>=416){
-                                tank.y = 416
+                            console.log(tank.y)
+                            if(tank.y >= 384){
+                                tank.y = 384
                                 return;
                             }
-                            tank.y++;
+                            tank.y += gogogo()
+                            /*if(go == 1){
+                                tank.y ++
+                            }else if(go == 2){
+                                tank.y += 2
+                            }*/
                         },20);
                         break;
                     case 68:
                         if(dir == 68)return;
                         clearInterval(timer)
-                        dir = 68;
+                        dir = 68
+                        tank.dir = 1
                         timer = setInterval(()=>{
-                            if(tank.x>=416){
-                                tank.x = 416
+                            if(tank.x >= 384){
+                                tank.x = 384
                                 return;
                             }
-                            tank.x++;
+                            tank.x += gogogo()
+                            /*if(go == 1){
+                                tank.x ++
+                            }else if(go == 2){
+                                tank.x += 2
+                            }*/
                         },20);
                         break;
                 }
@@ -163,6 +179,19 @@ export default {
                     clearInterval(timer)
                 }
             },false)
+
+            function gogogo(){
+                const res = []
+                root.getArea(tank.rect, res)
+                for(let i =0; i < res.length; i++){
+                    if(res[i].type > 0 && res[i].type <= 19){
+                        return 0
+                    }else if(res[i].type == 20){
+                        return 2
+                    }
+                }
+                return 1
+            }
         },
         collided(root,obj){
             const res = []

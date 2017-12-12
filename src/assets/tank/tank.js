@@ -31,6 +31,7 @@
 
 export class Tank {
 
+	d = 0;
 	step = 0;  //tank实例 移动 左右脚（0:左脚  1:右脚）
 	state = 0; //tank实例 的 状态 （player 吃了五角星之后，state+1
 
@@ -56,30 +57,16 @@ export class Tank {
 
 		this.preX = 0
 		this.preY = this.type * 128
+
+		if(type > 1){
+			this.move()
+		}
 	}
 
-	get rect(){
-		switch(this.dir){
-			case 0: 	// 上
-				this.X = this.x + 2
-				this.Y = this.y
-				break;
-			case 1: 	// 右
-			case 2: 	// 下
-				this.X = this.x + 2
-				this.Y = this.y + 2
-				break;
-			case 3: 	// 左
-				this.X = this.x
-				this.Y = this.y + 2
-				break;
-		}
-		return {
-			x: this.X,
-			y: this.Y,
-			w: this.W,
-			h: this.H,
-		}
+	move(){
+		setInterval(()=>{
+			
+		}, 20);
 	}
 
 	draw(ct, tank){
@@ -94,6 +81,41 @@ export class Tank {
 		)
 	}
 
+	get rect(){
+		switch(this.dir){
+			case 0: 	// 上
+				this.X = this.x + 2
+				this.Y = this.y
+				this.W = 28
+				this.H = 30
+				break;
+			case 1: 	// 右
+				this.X = this.x + 2
+				this.Y = this.y + 2
+				this.W = 30
+				this.H = 28
+				break;
+			case 2: 	// 下
+				this.W = 28
+				this.H = 30
+				this.X = this.x + 2
+				this.Y = this.y + 2
+				break;
+			case 3: 	// 左
+				this.W = 30
+				this.H = 28
+				this.X = this.x
+				this.Y = this.y + 2
+				break;
+		}
+		return {
+			x: this.X,
+			y: this.Y,
+			w: this.W,
+			h: this.H,
+		}
+	}
+
 	get picX(){
 		return this.preX + this.state * 64 + this.step * 32
 	}
@@ -102,24 +124,26 @@ export class Tank {
 		return this.preY + this.dir * 32
 	}
 
-	//tank实例 方向
-	get D(){
-		return this.dir
+	get dir(){
+		return this.d
 	}
 
-	set D(v){
-		this.dir = v
-		switch(v){
-			case 0: 	// 上
-			case 2: 	// 下
-				this.W = 28
-				this.H = 30
-				break;
-			case 1: 	// 右
-			case 3: 	// 左
-				this.W = 30
-				this.H = 28
-				break;
+	set dir(v){
+		const interimX = this.x % 16
+		const interimY = this.y % 16
+
+		if(interimX < 8){
+			this.x -= interimX
+		}else {
+			this.x += (16 - interimX)
 		}
+
+		if(interimY < 8){
+			this.y -= interimY
+		}else {
+			this.y += (16 - interimY)
+		}
+
+		this.d = v
 	}
 }

@@ -61,6 +61,7 @@ export class Tank {
 		if(type > 1){
 			this.move(root)
 		}
+		root.inset(this.rect, this)
 	}
 
 	move(root){
@@ -100,7 +101,7 @@ export class Tank {
 					}
 					break;
 			}
-			if(a == 0 || Math.random() < 0.01){
+			if(a == 0 || Math.random() < 0.001){
 				this.dir = this.random()
 			}
 		}, 24)
@@ -108,7 +109,7 @@ export class Tank {
 
 	gogogo(root){
         const res = []
-        root.getArea(this.rect, res)
+        root.getArea(this, res)
 
         if(res.length === 0)return 1;
 

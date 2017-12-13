@@ -28,6 +28,7 @@ export default {
             const root = new Qtree()
             let _map = map(level)
             root.formatMap(_map)
+            console.log(root)
             const wallCanvas = this.createC()
             const tankPath = '/static/t.jpg'
             const wallPath = '/static/wall.png'
@@ -35,42 +36,55 @@ export default {
             const tank = await loadImg(tankPath)
 
             const player1 = new Tank(32*4+16,32*12,0,root)
+            const AI1 = new Tank(0,0,2,root)
+            const AI2 = new Tank(32*3,0,2,root)
+            const AI3 = new Tank(32*5,0,2,root)
+            const AI4 = new Tank(32*7,0,2,root)
+
+            //root.inset(player1.rect, player1)
+            //root.inset(AI1.rect, AI1)
+            //root.inset(AI2.rect, AI2)
+            //root.inset(AI3.rect, AI3)
+            //root.inset(AI4.rect, AI4)
             const tank_bullet = [player1]
 
-            tank_bullet.push(new Tank(0,0,2,root))
+            tank_bullet.push(AI1,AI2,AI3,AI4)
+            //tank_bullet.push(AI1)
             
             let stop = false
             document.addEventListener('click',function(){
-                //stop = true
+                stop = true
                 //_map[322].map = [0,0,0,1]
                 //_map[322].isChange = 1
+                //
+                
             },false)
-
             function draw(){
                 if(stop)return
                 //stop = true
                 //
-                //console.time('b')
+                console.time('b')
 
-                //     /*const res = []
-                //     root.getArea(player1.rect, res)
-                //     console.log(res)*/
-                //     console.time('draw')
+                    console.time('refresh')
+                        root.refresh(root)
+                    console.timeEnd('refresh')
+
+                    console.time('draw')
                         mapDraw(_map, wallCanvas.getContext('2d'), wall)
-                //     console.timeEnd('draw')
+                    console.timeEnd('draw')
 
-                //     console.time('tank')
+                    console.time('tank')
                         for (let i = 0; i < tank_bullet.length; i++) {
                             tank_bullet[i].draw(wallCanvas.getContext('2d'),tank)
                         }
-                //     console.timeEnd('tank')
-                    
-                //     console.time('clear')
+                    console.timeEnd('tank')
+
+                    console.time('clear')
                         ct.clearRect(0,0,416,416)
                         ct.drawImage(wallCanvas,0,0)
-                //     console.timeEnd('clear')
-                    
-                //console.timeEnd('b') 
+                    console.timeEnd('clear')
+
+                console.timeEnd('b') 
 
                 requestAnimationFrame(draw)
             }
@@ -183,7 +197,7 @@ export default {
 
             function gogogo(){
                 const res = []
-                root.getArea(tank.rect, res)
+                root.getArea(tank, res)
 
                 if(res.length === 0)return 1;
 

@@ -1,3 +1,15 @@
+//	--------------------
+// |		  |			|
+// |		  |			|
+// |	1	  |		2	|
+// |		  |			|
+// |--------------------|
+// |		  |			|
+// |		  |			|
+// |	3	  |		4	|
+// |		  |			|
+//	--------------------
+//	
 class Qtree{
 	constructor ( bounds = {x:0,y:0,w:416,h:416}, level = 0){
 		//本区域的范围
@@ -21,7 +33,7 @@ class Qtree{
 	}
 	//将 obj 放入到 对应的 象限中去 （最底层的象限）
 	inset (rect,obj){
-		if(this.level === this.max_level){
+		if(this.level === this.max_level && !this.isContain(this.item, obj)){
 			this.item.push(obj)
 		}else{
 			for(let i = 0; i < this.children.length; i++){
@@ -35,26 +47,12 @@ class Qtree{
 	formatMap(map){
 		for(let i = 0; i<map.length; i++){
 			//0 没有建筑   13 草坪
-			if(map[i].type == 0 || map[i].type == 13)continue;
+			if(map[i].type === 0 || map[i].type === 13)continue;
             if(this.isCollided(map[i].rect)){
                 this.inset(map[i].rect, map[i])
             }
         }
 	}
-
-	//
-	//	--------------------
-	// |		  |			|
-	// |		  |			|
-	// |	1	  |		2	|
-	// |		  |			|
-	// |--------------------|
-	// |		  |			|
-	// |		  |			|
-	// |	3	  |		4	|
-	// |		  |			|
-	//	--------------------
-	//	
 	// 分割象限
 	split(){
 		const level = this.level +1
@@ -72,25 +70,24 @@ class Qtree{
 		)
 	}
 	// 获取 rect 可能 碰撞物体的 集合
-	getArea(rect,res){
-		if(this.level === 4){
+	getArea(obj,res){
+		if(this.level === this.max_level){
 			for (let i = 0; i < this.item.length; i++) {
-				if(!this.isContain(res, this.item[i]) &&  this.isCollided(rect,this.item[i].rect)){
+				if(!this.isContain(res, this.item[i]) && this.isCollided(obj.rect, this.item[i].rect) && this.item[i] != obj){
 					res.push(this.item[i])
 				}
 			}
 		}else{
 			for(let i = 0; i < this.children.length; i++){
-				if(this.children[i].isCollided(rect)){
-					this.children[i].getArea(rect,res)
+				if(this.children[i].isCollided(obj.rect)){
+					this.children[i].getArea(obj,res)
 				}
 			}
 		}
 	}
-
 	//判断是否 与当前 对象碰撞 
 	isCollided (rect,bound){
-		const bounds = bound || this.bounds; 
+		const bounds = bound || this.bounds
 		if(
 			rect.x > bounds.x + bounds.w || 
 			rect.x + rect.w < bounds.x || 
@@ -99,7 +96,6 @@ class Qtree{
 		){
 			return false
 		}
-
 		return true
 	}
 	//判断数组中 是否包含对象
@@ -110,6 +106,24 @@ class Qtree{
 			}
 		}
 		return false
+	}
+	//更新每一项 象限信息
+	refresh(root){
+		if(this.level === this.max_level){
+			for (let i = 0; i < this.item.length; i++) {
+				if(!this.isCollided(this.item[i].rect)){
+					const item = this.item.splice(i--,1)[0]
+					root.inset(item.rect, item)
+
+				}else{
+					root.inset(this.item[i].rect, this.item[i])
+				}
+			}
+		}else{
+			for (let i = 0; i < this.children.length; i++) {
+				this.children[i].refresh(root)
+			}
+		}
 	}
 }
 
